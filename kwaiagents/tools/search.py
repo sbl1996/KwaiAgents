@@ -116,7 +116,7 @@ class SearchTool(BaseTool):
             except:
                 print(traceback.format_exc())
                 use_selenium = True
-                search_results = None
+                # search_results = None
             if not search_results and counter >= 2:
                 use_selenium = True
             if use_selenium:

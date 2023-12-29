@@ -125,14 +125,32 @@ class GeminiClient(object):
             stop_sequences=stop_sequences,
             temperature=temperature,
         )
+        safety_settings = [
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_ONLY_HIGH",
+            },
+        ]
 
         try:
             response = self._client.generate_content(
-                msgs, generation_config=gen_config)
-            response_text = response.text
+                msgs, generation_config=gen_config,
+                safety_settings=safety_settings)
         except:
+            print(response.prompt_feedback)
             print(traceback.format_exc())
+            response = None
+
+        if response is not None:
+            try:
+                response_text = response.text
+            except:
+                print(response.prompt_feedback)
+                print(traceback.format_exc())
+                response_text = ""
+        else:
             response_text = ""
+
         new_history = history[:] + [[query, response_text]]
         return response_text, new_history
 
