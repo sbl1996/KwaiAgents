@@ -53,7 +53,7 @@ class SearchTool(BaseTool):
     description = "Web Search:\"web_search\",args:\"text\":\"<search>\""
     tips = ""
     
-    def __init__(self, cfg=None, max_search_nums=5, lang="wt-wt", max_retry_times=5, *args, **kwargs):
+    def __init__(self, cfg=None, max_search_nums=5, lang="sg-en", max_retry_times=5, *args, **kwargs):
         self.cfg = cfg if cfg else Config()
         self.max_search_nums = max_search_nums
         self.max_retry_times = max_retry_times
@@ -95,7 +95,7 @@ class SearchTool(BaseTool):
 
         my_proxy = os.getenv("http_proxy")
         with DDGS(proxies=my_proxy, timeout=20) as ddgs:
-            ddgs_gen = ddgs.text(keyword, backend="api", region='sg-en', timelimit='y')
+            ddgs_gen = ddgs.text(keyword, backend="api", region=self.lang, timelimit='y')
             for r in islice(ddgs_gen, self.max_search_nums):
                 search_results.append(r)
         return search_results
@@ -116,6 +116,7 @@ class SearchTool(BaseTool):
             except:
                 print(traceback.format_exc())
                 use_selenium = True
+                search_results = None
             if not search_results and counter >= 2:
                 use_selenium = True
             if use_selenium:

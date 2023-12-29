@@ -174,7 +174,7 @@ def make_no_task_conclusion_prompt(query, conversation_history=""):
 
 
 def prompt_truncate(tokenizer, prompt, memory, input_max_length):
-    kwargs = dict(add_special_tokens=False)
+    kwargs = dict(add_special_tokens=False, max_length=input_max_length, truncation=False)
     prompt_tokens = tokenizer.encode(prompt, **kwargs)
     if len(prompt_tokens) > input_max_length:
         if memory is None or memory not in prompt:

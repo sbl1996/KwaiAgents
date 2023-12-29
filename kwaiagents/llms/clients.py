@@ -1,11 +1,9 @@
-import logging
 import os
 import requests
-import sys
-import time
 import traceback
 
 import openai
+import google.generativeai as genai
 
 
 def make_gpt_messages(query, system, history):
@@ -31,41 +29,112 @@ def make_gpt_messages(query, system, history):
     return msgs
 
 
+def make_gemini_messages(query, system, history):
+    assert not system
+    msgs = list()
+    for q, a in history:
+        msgs.append({
+            "role": "user",
+            "parts": [str(q)],
+        })
+        msgs.append({
+            "role": "model",
+            "parts": [str(a)],
+        })
+    msgs.append({
+        "role": "user",
+        "parts": [query],
+    })
+    return msgs
+
+
+# class OpenAIClient(object):
+#     def __init__(self, model="gpt-3.5-turbo"):
+#         self.model = model
+#         openai.api_type = os.environ.get("OPENAI_API_TYPE", "open_ai")
+#         openai.api_key = os.environ["OPENAI_API_KEY"]
+#         if openai.api_type == "azure":
+#             openai.api_version = os.environ["OPENAI_API_VERSION"]
+#             openai.api_base = os.environ["OPENAI_API_BASE"]
+
+#     def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
+#         msgs = make_gpt_messages(query, system, history)
+
+#         try:
+#             if openai.api_type == "open_ai":
+#                 response = openai.ChatCompletion.create(
+#                     model=self.model,
+#                     messages=msgs,
+#                     temperature = temperature,
+#                     stop=stop
+#                     )
+#             elif openai.api_type == "azure":
+#                 response = openai.ChatCompletion.create(
+#                     engine = self.model,
+#                     messages=msgs,
+#                     temperature = temperature,
+#                     stop=stop
+#                 )
+#             response_text = response['choices'][0]['message']['content']
+#         except:
+#             print(traceback.format_exc())
+#             response_text = ""
+
+#         new_history = history[:] + [[query, response_text]]
+#         return response_text, new_history
+
+
 class OpenAIClient(object):
-    def __init__(self, model="gpt-3.5-turbo"):
+    def __init__(self, model="gpt-3.5-turbo-1106"):
         self.model = model
-        openai.api_type = os.environ.get("OPENAI_API_TYPE", "open_ai")
-        openai.api_key = os.environ["OPENAI_API_KEY"]
-        if openai.api_type == "azure":
-            openai.api_version = os.environ["OPENAI_API_VERSION"]
-            openai.api_base = os.environ["OPENAI_API_BASE"]
+        client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        self._client = client
 
     def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
         msgs = make_gpt_messages(query, system, history)
 
         try:
-            if openai.api_type == "open_ai":
-                response = openai.ChatCompletion.create(
-                    model=self.model,
-                    messages=msgs,
-                    temperature = temperature,
-                    stop=stop
-                    )
-            elif openai.api_type == "azure":
-                response = openai.ChatCompletion.create(
-                    engine = self.model,
-                    messages=msgs,
-                    temperature = temperature,
-                    stop=stop
-                )
-            response_text = response['choices'][0]['message']['content']
+            response = self._client.chat.completions.create(
+                model=self.model,
+                messages=msgs,
+                temperature = temperature,
+                stop=stop
+            )
+            response_text = response.choices[0].message.content
         except:
             print(traceback.format_exc())
             response_text = ""
-
         new_history = history[:] + [[query, response_text]]
         return response_text, new_history
 
+
+class GeminiClient(object):
+    def __init__(self, model="gemini-pro"):
+        self.model = model
+
+        genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+        self._client = genai.GenerativeModel(model)
+
+    def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
+        msgs = make_gemini_messages(query, system, history)
+        stop_sequences = []
+        if stop:
+            stop_sequences = [stop]
+        gen_config = genai.types.GenerationConfig(
+            candidate_count=1,
+            stop_sequences=stop_sequences,
+            temperature=temperature,
+        )
+
+        try:
+            response = self._client.generate_content(
+                msgs, generation_config=gen_config)
+            response_text = response.text
+        except:
+            print(traceback.format_exc())
+            response_text = ""
+        new_history = history[:] + [[query, response_text]]
+        return response_text, new_history
 
 class FastChatClient(object):
     def __init__(self, model="kagentlms_baichuan2_13b_mat", host="localhost", port=8888):

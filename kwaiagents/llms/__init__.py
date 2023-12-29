@@ -1,9 +1,8 @@
 from __future__ import annotations
 import time
-import traceback
 
 from kwaiagents.config import CFG
-from kwaiagents.llms.clients import OpenAIClient, FastChatClient
+from kwaiagents.llms.clients import OpenAIClient, FastChatClient, GeminiClient
 
 
 def create_chat_completion(
@@ -18,6 +17,8 @@ def create_chat_completion(
 ) -> tuple[str, list[tuple[str, str]]]:
     if CFG.use_local_llm:
         llm_bot = FastChatClient(llm_model_name.lower(), host=CFG.local_llm_host, port=CFG.local_llm_port)
+    elif 'gemini' in llm_model_name.lower():
+        llm_bot = GeminiClient(llm_model_name.lower())
     else:
         llm_bot = OpenAIClient(llm_model_name.lower())
     response = None
