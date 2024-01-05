@@ -3,8 +3,8 @@ pandas
 docstring_parser
 lunar_python
 duckduckgo-search
-selenium==4.1.4
-webdriver-manager==3.8.6
+selenium
+webdriver-manager
 openai
 translate
 ephem

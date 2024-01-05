@@ -7,9 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.safari.options import Options as SafariOptions
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 import logging
 
 import time
@@ -18,7 +16,6 @@ import time
 def get_web_driver(selenium_web_browser):
     options_available = {
         "chrome": ChromeOptions,
-        "safari": SafariOptions,
         "firefox": FirefoxOptions,
     }
 
@@ -28,13 +25,9 @@ def get_web_driver(selenium_web_browser):
     )
     
     if selenium_web_browser == "firefox":
-        current_driver = webdriver.Firefox(
-            executable_path=GeckoDriverManager().install(), options=options
-        )
-    elif selenium_web_browser == "safari":
-        # Requires a bit more setup on the users end
-        # See https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari
-        current_driver = webdriver.Safari(options=options)
+        options.headless = True
+        options.add_argument("--disable-gpu")
+        current_driver = webdriver.Firefox(options=options)
     else:
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
@@ -48,7 +41,7 @@ def get_web_driver(selenium_web_browser):
 
 def get_pagesource_with_selenium(url: str, selenium_web_browser:str, driver: WebDriver = None) -> str:
     logging.getLogger("selenium").setLevel(logging.CRITICAL)
-    driver = get_web_driver(selenium_web_browser)
+    # driver = get_web_driver(selenium_web_browser)
     if driver is None:
         driver = get_web_driver(selenium_web_browser)
     

@@ -71,7 +71,7 @@ class SearchTool(BaseTool):
             
     def get_results_by_selenium(self, keyword):
         url = f"https://duckduckgo.com/?q={keyword}&t=h_&ia=web"
-        driver, page_source = get_pagesource_with_selenium(url, "chrome", self.driver)
+        driver, page_source = get_pagesource_with_selenium(url, self.cfg.selenium_web_browser, self.driver)
         self.set_driver(driver)
         page_soup = soup(page_source, "html.parser")
         articles = page_soup.find_all("article")

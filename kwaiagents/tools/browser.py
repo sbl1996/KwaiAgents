@@ -66,7 +66,7 @@ def browse_website(url: str, question: str, cfg: Config = None) -> tuple[str, We
     if cfg:
         cfg.chain_logger.put("click", f"Access the website {url} ")
     driver, text = scrape_text_with_selenium(url, cfg)
-    add_header(driver)
+    # add_header(driver)
     summary_text, prompt_responses = summary.summarize_text(url, text, question, driver, cfg)
     links = scrape_links_with_selenium(driver, url)
 

@@ -25,6 +25,7 @@ class AgentService(object):
         cfg.max_tokens_num = input_dict.get("max_tokens_num", 4096)
         if llm_name == "gpt-4":
             cfg.fast_llm_model = "gpt-3.5-turbo"
+        cfg.selenium_web_browser = input_dict.get("selenium_web_browser", "chrome")
 
         return cfg
 
@@ -108,12 +109,14 @@ def main():
     parser.add_argument("--external_knowledge", type=str, default="", help="The link of external knowledge")
     parser.add_argument("--lang", type=str, default="en", choices=["en", "zh"], help="The language of the overall system")
     parser.add_argument("--max_tokens_num", type=int, default=4096, help="Maximum length of model input")
+    parser.add_argument("--selenium_web_browser", type=str, default='chrome', help="The browser of selenium")
 
     args = parser.parse_args()
 
     CFG.local_llm_host = args.local_llm_host
     CFG.local_llm_port = args.local_llm_port
     CFG.use_local_llm = args.use_local_llm
+    CFG.selenium_web_browser = args.selenium_web_browser
 
     agent_service = AgentService()
 

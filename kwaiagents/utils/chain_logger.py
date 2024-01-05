@@ -71,7 +71,7 @@ ACTION_COLORED_TEXTS_EN = {
 logging_think_fail_msg = lambda lang: "我思考失败了" if lang == "zh" else "my thinking procedure failed."
 logging_execute_fail_msg = lambda lang: "执行失败了" if lang == "zh" else "my execution procedure failed."
 logging_do_not_need_use_tool_msg = lambda lang: "我认为不需要使用工具" if lang == "zh" else "I don't think I need to use tools."
-logging_do_not_need_use_tool_anymore_msg = lambda lang: "我认为不需要使用工具" if lang == "zh" else "I don't think I need to use tools anymore."
+logging_do_not_need_use_tool_anymore_msg = lambda lang: "我认为不再需要使用工具" if lang == "zh" else "I don't think I need to use tools anymore."
 logging_stop_thinking_msg = lambda lang: "对不起，我思考的步数有限，现在做个总结" if lang == "zh" else "Sorry, my thinking steps are limited, now let's make a conclusion."
 logging_finish_task_msg = lambda lang: "任务完成，得出结论" if lang == "zh" else "Task complete, let's make a conclusion."
 

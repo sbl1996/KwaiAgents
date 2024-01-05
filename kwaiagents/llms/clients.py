@@ -48,64 +48,64 @@ def make_gemini_messages(query, system, history):
     return msgs
 
 
-# class OpenAIClient(object):
-#     def __init__(self, model="gpt-3.5-turbo"):
-#         self.model = model
-#         openai.api_type = os.environ.get("OPENAI_API_TYPE", "open_ai")
-#         openai.api_key = os.environ["OPENAI_API_KEY"]
-#         if openai.api_type == "azure":
-#             openai.api_version = os.environ["OPENAI_API_VERSION"]
-#             openai.api_base = os.environ["OPENAI_API_BASE"]
-
-#     def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
-#         msgs = make_gpt_messages(query, system, history)
-
-#         try:
-#             if openai.api_type == "open_ai":
-#                 response = openai.ChatCompletion.create(
-#                     model=self.model,
-#                     messages=msgs,
-#                     temperature = temperature,
-#                     stop=stop
-#                     )
-#             elif openai.api_type == "azure":
-#                 response = openai.ChatCompletion.create(
-#                     engine = self.model,
-#                     messages=msgs,
-#                     temperature = temperature,
-#                     stop=stop
-#                 )
-#             response_text = response['choices'][0]['message']['content']
-#         except:
-#             print(traceback.format_exc())
-#             response_text = ""
-
-#         new_history = history[:] + [[query, response_text]]
-#         return response_text, new_history
-
-
 class OpenAIClient(object):
     def __init__(self, model="gpt-3.5-turbo-1106"):
         self.model = model
-        client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-        self._client = client
+        openai.api_type = os.environ.get("OPENAI_API_TYPE", "open_ai")
+        openai.api_key = os.environ["OPENAI_API_KEY"]
+        if openai.api_type == "azure":
+            openai.api_version = os.environ["OPENAI_API_VERSION"]
+            openai.api_base = os.environ["OPENAI_API_BASE"]
 
     def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
         msgs = make_gpt_messages(query, system, history)
 
         try:
-            response = self._client.chat.completions.create(
-                model=self.model,
-                messages=msgs,
-                temperature = temperature,
-                stop=stop
-            )
-            response_text = response.choices[0].message.content
+            if openai.api_type == "open_ai":
+                response = openai.ChatCompletion.create(
+                    model=self.model,
+                    messages=msgs,
+                    temperature = temperature,
+                    stop=stop
+                    )
+            elif openai.api_type == "azure":
+                response = openai.ChatCompletion.create(
+                    engine = self.model,
+                    messages=msgs,
+                    temperature = temperature,
+                    stop=stop
+                )
+            response_text = response['choices'][0]['message']['content']
         except:
             print(traceback.format_exc())
             response_text = ""
+
         new_history = history[:] + [[query, response_text]]
         return response_text, new_history
+
+
+# class OpenAIClient(object):
+#     def __init__(self, model="gpt-3.5-turbo-1106"):
+#         self.model = model
+#         client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+#         self._client = client
+
+#     def chat(self, query, history=list(), system="", temperature=0.0, stop="", *args, **kwargs):
+#         msgs = make_gpt_messages(query, system, history)
+
+#         try:
+#             response = self._client.chat.completions.create(
+#                 model=self.model,
+#                 messages=msgs,
+#                 temperature = temperature,
+#                 stop=stop
+#             )
+#             response_text = response.choices[0].message.content
+#         except:
+#             print(traceback.format_exc())
+#             response_text = ""
+#         new_history = history[:] + [[query, response_text]]
+#         return response_text, new_history
 
 
 class GeminiClient(object):
@@ -150,6 +150,13 @@ class GeminiClient(object):
                 response_text = ""
         else:
             response_text = ""
+        
+        print("Query start------------------")
+        print(query)
+        print("Query end--------------------")
+        print("Response start---------------")
+        print(response_text)
+        print("Response end-----------------")
 
         new_history = history[:] + [[query, response_text]]
         return response_text, new_history
